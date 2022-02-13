@@ -2,5 +2,6 @@ Services:
 	Catalog : 5011 - MongoDb
 	PhotoStock : 5012
 	Basket : 5013 - Redis
+	Discount : 5014 - Postgresql
 
 Identity : 5001 - Sql Server
