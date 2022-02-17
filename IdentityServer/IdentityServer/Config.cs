@@ -18,6 +18,7 @@ namespace IdentityServer
                 new ApiResource("resource_photo_stock"){Scopes=new List<string> { "photo_stock_fullpermission"}},
                 new ApiResource("resource_basket"){Scopes=new List<string> { "basket_fullpermission"}},
                 new ApiResource("resource_discount"){Scopes=new List<string> { "discount_fullpermission"}},
+                new ApiResource("resource_order"){Scopes=new List<string> { "order_fullpermission"}},
                 new ApiResource(IdentityServerConstants.LocalApi.ScopeName)
             };
 
@@ -38,6 +39,7 @@ namespace IdentityServer
                 new ApiScope("photo_stock_fullpermission","Photo Stock Api için full yetki"),
                 new ApiScope("basket_fullpermission","Basket Api için full yetki"),
                 new ApiScope("discount_fullpermission","Discount Api için full yetki"),
+                new ApiScope("order_fullpermission","Order Api için full yetki"),
                 new ApiScope(IdentityServerConstants.LocalApi.ScopeName)
             };
 
@@ -63,6 +65,7 @@ namespace IdentityServer
                     {
                         "basket_fullpermission",
                         "discount_fullpermission",
+                        "order_fullpermission",
                         IdentityServerConstants.StandardScopes.Email ,
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,

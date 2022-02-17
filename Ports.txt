@@ -3,5 +3,6 @@ Services:
 	PhotoStock : 5012
 	Basket : 5013 - Redis
 	Discount : 5014 - Postgresql
+	Order : 5015 - Sql Server
 
 Identity : 5001 - Sql Server
