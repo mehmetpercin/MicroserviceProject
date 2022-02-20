@@ -8,3 +8,4 @@ Services:
 
 Identity : 5001 - Sql Server
 Gateway : 5000
+Web : 5010
