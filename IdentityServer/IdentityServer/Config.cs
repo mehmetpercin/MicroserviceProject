@@ -20,6 +20,7 @@ namespace IdentityServer
                 new ApiResource("resource_discount"){Scopes=new List<string> { "discount_fullpermission"}},
                 new ApiResource("resource_order"){Scopes=new List<string> { "order_fullpermission"}},
                 new ApiResource("resource_payment"){Scopes=new List<string> { "payment_fullpermission"}},
+                new ApiResource("resource_gateway"){Scopes=new List<string> { "gateway_fullpermission"}},
                 new ApiResource(IdentityServerConstants.LocalApi.ScopeName)
             };
 
@@ -42,6 +43,7 @@ namespace IdentityServer
                 new ApiScope("discount_fullpermission","Discount Api için full yetki"),
                 new ApiScope("order_fullpermission","Order Api için full yetki"),
                 new ApiScope("payment_fullpermission","Payment Api için full yetki"),
+                new ApiScope("gateway_fullpermission","Gateway için full yetki"),
                 new ApiScope(IdentityServerConstants.LocalApi.ScopeName)
             };
 
@@ -54,7 +56,7 @@ namespace IdentityServer
                     ClientId ="WebMvcClient",
                     ClientSecrets={new Secret("secret".Sha256())},
                     AllowedGrantTypes=GrantTypes.ClientCredentials,
-                    AllowedScopes=new List<string> { "catalog_fullpermission", "photo_stock_fullpermission",IdentityServerConstants.LocalApi.ScopeName }
+                    AllowedScopes=new List<string> { "catalog_fullpermission", "photo_stock_fullpermission", "gateway_fullpermission", IdentityServerConstants.LocalApi.ScopeName }
                 },
                 new Client
                 {
@@ -69,6 +71,7 @@ namespace IdentityServer
                         "discount_fullpermission",
                         "order_fullpermission",
                         "payment_fullpermission",
+                        "gateway_fullpermission",
                         IdentityServerConstants.StandardScopes.Email ,
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,

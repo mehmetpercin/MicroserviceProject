@@ -7,3 +7,4 @@ Services:
 	Payment : 5016
 
 Identity : 5001 - Sql Server
+Gateway : 5000
