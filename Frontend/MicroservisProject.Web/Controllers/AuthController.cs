@@ -1,5 +1,7 @@
 ﻿using MicroservisProject.Web.Models;
 using MicroservisProject.Web.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MicroservisProject.Web.Controllers
@@ -36,6 +38,14 @@ namespace MicroservisProject.Web.Controllers
 
                 return View(response);
             }
+
+            return RedirectToAction(nameof(Index), "Home");
+        }
+
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await _identityService.RevokeRefrehToken();
 
             return RedirectToAction(nameof(Index), "Home");
         }
