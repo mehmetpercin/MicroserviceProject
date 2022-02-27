@@ -1,4 +1,5 @@
-﻿using MicroservisProject.Web.Models.Catalog;
+﻿using MicroservisProject.Web.Helpers;
+using MicroservisProject.Web.Models.Catalog;
 using MicroservisProject.Web.Services.Interfaces;
 using SharedLibrary.Dtos;
 
@@ -7,20 +8,30 @@ namespace MicroservisProject.Web.Services
     public class CatalogService : ICatalogService
     {
         private readonly HttpClient _httpClient;
+        private readonly IPhotoStockService _photoStockService;
+        private readonly PhotoHelper _photoHelper;
 
-        public CatalogService(HttpClient httpClient)
+        public CatalogService(HttpClient httpClient, IPhotoStockService photoStockService, PhotoHelper photoHelper)
         {
             _httpClient = httpClient;
+            _photoStockService = photoStockService;
+            _photoHelper = photoHelper;
         }
 
         public async Task<bool> CreateCategory(CategoryCreateInput categoryCreateInput)
         {
-            var response = await _httpClient.PostAsJsonAsync($"categories/Create",categoryCreateInput);
+            var response = await _httpClient.PostAsJsonAsync($"categories/Create", categoryCreateInput);
             return response.IsSuccessStatusCode;
         }
 
         public async Task<bool> CreateCourse(CourseCreateInput courseCreateInput)
         {
+            var photoResponse = await _photoStockService.UploadPhoto(courseCreateInput.PhotoFormFile);
+            if (photoResponse.Url != null)
+            {
+                courseCreateInput.Picture = photoResponse.Url;
+            }
+
             var response = await _httpClient.PostAsJsonAsync($"courses/Create", courseCreateInput);
             return response.IsSuccessStatusCode;
         }
@@ -52,6 +63,11 @@ namespace MicroservisProject.Web.Services
             }
 
             var successResponse = await response.Content.ReadFromJsonAsync<Response<List<CourseViewModel>>>();
+            successResponse.Data.ForEach(x =>
+            {
+                x.Picture = _photoHelper.GetPhotoStockUrl(x.Picture);
+            });
+
             return successResponse.Data;
         }
 
@@ -64,6 +80,10 @@ namespace MicroservisProject.Web.Services
             }
 
             var successResponse = await response.Content.ReadFromJsonAsync<Response<List<CourseViewModel>>>();
+            successResponse.Data.ForEach(x =>
+            {
+                x.Picture = _photoHelper.GetPhotoStockUrl(x.Picture);
+            });
             return successResponse.Data;
         }
 
@@ -93,6 +113,15 @@ namespace MicroservisProject.Web.Services
 
         public async Task<bool> UpdateCourse(CourseUpdateInput courseUpdateInput)
         {
+            if(courseUpdateInput.PhotoFormFile != null && courseUpdateInput.PhotoFormFile.Length > 0)
+            {
+                var photoResponse = await _photoStockService.UploadPhoto(courseUpdateInput.PhotoFormFile);
+                if (photoResponse.Url != null)
+                {
+                    _photoStockService.DeletePhoto(courseUpdateInput.Picture);
+                    courseUpdateInput.Picture = photoResponse.Url;
+                }
+            }
             var response = await _httpClient.PutAsJsonAsync($"courses/Update", courseUpdateInput);
             return response.IsSuccessStatusCode;
         }

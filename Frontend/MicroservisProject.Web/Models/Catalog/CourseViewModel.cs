@@ -6,6 +6,7 @@
         public string Name { get; set; }
         public decimal Price { get; set; }
         public string Description { get; set; }
+        public string ShortDescription => Description.Length > 100 ? Description[..100] + "..." : Description;
         public string Picture { get; set; }
         public DateTime CreatedTime { get; set; }
         public string UserId { get; set; }

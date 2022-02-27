@@ -23,7 +23,7 @@ namespace Services.PhotoStock.Controllers
             await photo.CopyToAsync(stream, cancellationToken);
             var photoDto = new PhotoDto
             {
-                Url = $"photos/{photo.FileName}"
+                Url = photo.FileName
             };
             return CreateActionResultInstance(Response<PhotoDto>.Success(photoDto, 200));
         }
