@@ -65,7 +65,7 @@ namespace MicroservisProject.Web.Services
             var successResponse = await response.Content.ReadFromJsonAsync<Response<List<CourseViewModel>>>();
             successResponse.Data.ForEach(x =>
             {
-                x.Picture = _photoHelper.GetPhotoStockUrl(x.Picture);
+                x.StockPictureUrl = _photoHelper.GetPhotoStockUrl(x.Picture);
             });
 
             return successResponse.Data;
@@ -82,7 +82,7 @@ namespace MicroservisProject.Web.Services
             var successResponse = await response.Content.ReadFromJsonAsync<Response<List<CourseViewModel>>>();
             successResponse.Data.ForEach(x =>
             {
-                x.Picture = _photoHelper.GetPhotoStockUrl(x.Picture);
+                x.StockPictureUrl = _photoHelper.GetPhotoStockUrl(x.Picture);
             });
             return successResponse.Data;
         }
@@ -108,12 +108,14 @@ namespace MicroservisProject.Web.Services
             }
 
             var successResponse = await response.Content.ReadFromJsonAsync<Response<CourseViewModel>>();
+            successResponse.Data.StockPictureUrl = _photoHelper.GetPhotoStockUrl(successResponse.Data.Picture);
+
             return successResponse.Data;
         }
 
         public async Task<bool> UpdateCourse(CourseUpdateInput courseUpdateInput)
         {
-            if(courseUpdateInput.PhotoFormFile != null && courseUpdateInput.PhotoFormFile.Length > 0)
+            if (courseUpdateInput.PhotoFormFile != null && courseUpdateInput.PhotoFormFile.Length > 0)
             {
                 var photoResponse = await _photoStockService.UploadPhoto(courseUpdateInput.PhotoFormFile);
                 if (photoResponse.Url != null)

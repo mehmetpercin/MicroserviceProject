@@ -4,7 +4,7 @@
     {
         public string UserId { get; set; }
         public string DiscountCode { get; set; }
-        public List<BasketItemDto> Items { get; set; }
-        public decimal TotalPrice => Items.Sum(x => x.Price);
+        public List<BasketItemDto> BasketItems { get; set; }
+        public decimal TotalPrice => BasketItems.Sum(x => x.Price);
     }
 }

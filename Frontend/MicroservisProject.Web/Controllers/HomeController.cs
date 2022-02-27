@@ -1,5 +1,7 @@
-﻿using MicroservisProject.Web.Models;
+﻿using MicroservisProject.Web.CustomExceptions;
+using MicroservisProject.Web.Models;
 using MicroservisProject.Web.Services.Interfaces;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -19,9 +21,19 @@ namespace MicroservisProject.Web.Controllers
             return View(await _catalogService.GetAllCourse());
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> Detail(string id)
+        {
+            return View(await _catalogService.GetCourseById(id));
+        }
+
         public IActionResult Error()
         {
+            var errorFeature = HttpContext.Features.Get<IExceptionHandlerFeature>();
+            if (errorFeature != null && errorFeature.Error is UnAuthorizeException)
+            {
+                return RedirectToAction(nameof(AuthController.Logout), "Auth");
+            }
+
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }

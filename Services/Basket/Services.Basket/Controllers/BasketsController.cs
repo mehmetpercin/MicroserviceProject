@@ -28,6 +28,7 @@ namespace Services.Basket.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveBasket(BasketDto basket)
         {
+            basket.UserId = _identityService.GetUserId;
             return CreateActionResultInstance(await _basketService.SaveBasket(basket));
         }
 
