@@ -7,10 +7,12 @@ namespace MicroservisProject.Web.Services
     public class BasketService : IBasketService
     {
         private readonly HttpClient _httpClient;
+        private readonly IDiscountService _discountService;
 
-        public BasketService(HttpClient httpClient)
+        public BasketService(HttpClient httpClient, IDiscountService discountService)
         {
             _httpClient = httpClient;
+            _discountService = discountService;
         }
 
         public async Task<bool> AddBasketItem(BasketItemViewModel basketItemViewModel)
@@ -25,17 +27,40 @@ namespace MicroservisProject.Web.Services
 
             basket = new BasketViewModel();
             basket.BasketItems.Add(basketItemViewModel);
+            var result = await SaveBasket(basket);
+            return result;
+        }
+
+        public async Task<bool> ApplyDiscount(string discountCode)
+        {
+            await CancelApplyDiscount();
+
+            var basket = await GetBasket();
+            if (basket == null)
+            {
+                return false;
+            }
+
+            var hasDiscount = await _discountService.GetDiscount(discountCode);
+            if (hasDiscount == null)
+            {
+                return false;
+            }
+
+            basket.ApplyDiscount(hasDiscount.Code, hasDiscount.Rate);
             return await SaveBasket(basket);
         }
 
-        public Task<bool> ApplyDiscount(string discountCode)
+        public async Task<bool> CancelApplyDiscount()
         {
-            throw new NotImplementedException();
-        }
+            var basket = await GetBasket();
+            if (basket == null || basket.DiscountCode == string.Empty)
+            {
+                return false;
+            }
 
-        public Task<bool> CancelApplyDiscount()
-        {
-            throw new NotImplementedException();
+            basket.CancelDiscount();
+            return await SaveBasket(basket);
         }
 
         public async Task<bool> DeleteBasket()
@@ -81,6 +106,9 @@ namespace MicroservisProject.Web.Services
 
         public async Task<bool> SaveBasket(BasketViewModel basketViewModel)
         {
+            basketViewModel.UserId = string.Empty;
+            basketViewModel.DiscountCode = basketViewModel.DiscountCode;
+
             var response = await _httpClient.PostAsJsonAsync("baskets", basketViewModel);
             return response.IsSuccessStatusCode;
         }

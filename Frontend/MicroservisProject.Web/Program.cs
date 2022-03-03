@@ -1,4 +1,6 @@
+using FluentValidation.AspNetCore;
 using MicroservisProject.Web.Extentions;
+using MicroservisProject.Web.Validators;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +17,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     opt.Cookie.Name = "microservicescookie";
 });
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CourseCreateInputValidator>());
 
 var app = builder.Build();
 
