@@ -26,7 +26,8 @@ namespace MicroservisProject.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Checkout(CheckoutInfoInput checkoutInfoInput)
         {
-            var orderStatus = await _orderService.CreateOrder(checkoutInfoInput);
+            // var orderStatus = await _orderService.CreateOrder(checkoutInfoInput); synchronous
+            var orderStatus = await _orderService.SuspendOrder(checkoutInfoInput);
             if (!orderStatus.IsSuccessful)
             {
                 var basket = await _basketService.GetBasket();
@@ -36,13 +37,19 @@ namespace MicroservisProject.Web.Controllers
                 return View();
             }
 
-            return RedirectToAction(nameof(SuccessfulCheckout), new { orderId = orderStatus.OrderId });
+            // return RedirectToAction(nameof(SuccessfulCheckout), new { orderId = orderStatus.OrderId }); // synchronous
+            return RedirectToAction(nameof(SuccessfulCheckout), new { orderId = new Random().Next(1, 500) });
         }
 
         public IActionResult SuccessfulCheckout(int orderId)
         {
             ViewBag.OrderId = orderId;
             return View();
+        }
+
+        public async Task<IActionResult> CheckoutHistory()
+        {
+            return View(await _orderService.GetOrders());
         }
     }
 }

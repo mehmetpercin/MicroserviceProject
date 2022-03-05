@@ -58,7 +58,7 @@ namespace MicroservisProject.Web.Services
 
             await _basketService.DeleteBasket();
 
-            var orderResponse =  await response.Content.ReadFromJsonAsync<Response<OrderCreatedViewModel>>();
+            var orderResponse = await response.Content.ReadFromJsonAsync<Response<OrderCreatedViewModel>>();
             return orderResponse.Data;
         }
 
@@ -68,9 +68,40 @@ namespace MicroservisProject.Web.Services
             return response.Data;
         }
 
-        public Task SuspendOrder(CheckoutInfoInput input)
+        public async Task<OrderSuspendViewModel> SuspendOrder(CheckoutInfoInput input)
         {
-            throw new NotImplementedException();
+            var basket = await _basketService.GetBasket();
+            var orderCreateInput = new OrderCreateInput
+            {
+                BuyerId = _sharedIdentityService.GetUserId,
+                Address = new AdressCreateInput
+                {
+                    District = input.District,
+                    Line = input.Line,
+                    Province = input.Province,
+                    Street = input.Street,
+                    ZipCode = input.ZipCode
+                },
+                OrderItems = basket.BasketItems.Select(x => new OrderItemViewModel { Price = x.CurrentPrice, ProductId = x.CourseId, ProductName = x.CourseName, PictureUrl = string.Empty }).ToList()
+            };
+            var payment = new PaymentInfoInput
+            {
+                CardName = input.CardName,
+                CardNumber = input.CardNumber,
+                CVV = input.CVV,
+                Expiration = input.Expiration,
+                TotalPrice = basket.TotalPrice,
+                Order = orderCreateInput
+            };
+
+            var responsePayment = await _paymentService.ReceivePayment(payment);
+            if (!responsePayment)
+            {
+                return new OrderSuspendViewModel { ErrorMessage = "Ödeme başarısız", IsSuccessful = false };
+            }
+            await _basketService.DeleteBasket();
+
+            return new OrderSuspendViewModel { IsSuccessful = true };
         }
     }
 }

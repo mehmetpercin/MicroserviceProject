@@ -1,8 +1,10 @@
+using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Services.Order.Application.Consumers;
 using Services.Order.Application.Handlers;
 using Services.Order.Infrastructure;
 using SharedLibrary.Services;
@@ -33,6 +35,28 @@ builder.Services.AddDbContext<OrderDbContext>(opt =>
 builder.Services.AddMediatR(typeof(CreateOrderCommandHandler).Assembly);
 builder.Services.AddScoped<ISharedIdentityService, SharedIdentityService>();
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<CreateOrderMessageCommandConsumer>();
+
+    x.UsingRabbitMq((context, configuration) =>
+    {
+        configuration.Host(builder.Configuration["RabbitMQUrl"], "/", host =>
+        {
+            host.Username("guest");
+            host.Password("guest");
+        });
+
+        configuration.ReceiveEndpoint("create-order-service", e =>
+        {
+            e.ConfigureConsumer<CreateOrderMessageCommandConsumer>(context);
+        });
+    });
+});
+
+builder.Services.AddMassTransitHostedService();
+
 
 builder.Services.AddControllers(opt =>
 {

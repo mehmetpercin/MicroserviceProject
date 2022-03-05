@@ -107,7 +107,8 @@ namespace MicroservisProject.Web.Services
         public async Task<bool> SaveBasket(BasketViewModel basketViewModel)
         {
             basketViewModel.UserId = string.Empty;
-            basketViewModel.DiscountCode = basketViewModel.DiscountCode;
+            basketViewModel.DiscountCode = basketViewModel.DiscountCode ?? string.Empty;
+            basketViewModel.DiscountRate = basketViewModel.DiscountRate ?? 0;
 
             var response = await _httpClient.PostAsJsonAsync("baskets", basketViewModel);
             return response.IsSuccessStatusCode;
